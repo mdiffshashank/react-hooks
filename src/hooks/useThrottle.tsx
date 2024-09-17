@@ -1,15 +1,25 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
-function useThrottle(value: unknown, limit = 2000) {
+function useThrottle(value: unknown, delay: number) {
   const [throttledValue, setThrottledValue] = useState(value);
+  const lastExecuted = useRef(Date.now());
 
   useEffect(() => {
     const handler = setTimeout(() => {
-      setThrottledValue(value);
-    }, limit);
+      const now = Date.now();
+      if (now - lastExecuted.current >= delay) {
+        setThrottledValue(value);
+        lastExecuted.current = now;
+      }
+    }, delay - (Date.now() - lastExecuted.current));
 
-    return () => clearTimeout(handler);
-  }, [value, limit]);
+    // Clear timeout on component unmount or when value/delay changes
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
 
   return throttledValue;
 }
+
+export default useThrottle;
