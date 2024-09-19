@@ -13,3 +13,5 @@ export function useDebounce(value: unknown, delay: number) {
 
   return debouncedValue;
 }
+
+//Use case: Debouncing search queries in forms.
